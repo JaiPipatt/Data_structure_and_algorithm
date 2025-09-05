@@ -25,14 +25,16 @@ struct sorted_node *gpa_ll = NULL;
 
 
 void add_to_database( int id, float gpa) {
-
-	// store in student_ll
-    struct ll_node *p = (struct ll_node*)malloc(sizeof(struct ll_node));
+	struct ll_node *p = (struct ll_node*)malloc(sizeof(struct ll_node));
 	p->id = id;
 	p->gpa = gpa;
-	p->next = student_ll;
-	student_ll = p;
-
+	if (student_ll == NULL) {
+		student_ll = p;
+		p->next = NULL;
+	}
+	else {
+		student_ll->next = p;
+	}
 	// store in sorted_id_node
 	struct sorted_node *temp = (struct sorted_node*)malloc(sizeof(struct sorted_node));
 	temp->data = p;
@@ -42,12 +44,14 @@ void add_to_database( int id, float gpa) {
 		id_ll = temp;
 
 		printf("added id in case empty\n");
-	} else if (id_ll->next==NULL)
+	} 
+	else if (id_ll->next==NULL)
 	{
-		if (id_ll->data->id > p->id) {
+		if (id_ll->data->id < p->id) {
 			id_ll->next = temp;
 			printf("id greater than head\n");
-		} else {
+		} 
+		else {
 			temp->next = id_ll;
 			id_ll->next = NULL;
 			id_ll = temp;
@@ -55,15 +59,24 @@ void add_to_database( int id, float gpa) {
 
 		}
 		printf("added id in case len<2\n");
-	} else {
+	} 
+	else {
 		printf("added id in case len>2\n");
-		while ((p->id) > (c->next->data->id) && (c->next != NULL)) {
-			c = c->next;
+		if ((p->id)<(c->data->id)) {
+			temp->next = id_ll;
+			id_ll = temp;
+			printf("added to head\n");
+		} 
+		else {
+			while ((c->next != NULL) && (p->id) > (c->next->data->id)) {
+				c = c->next;
+			}
 		}
 		if (c->next == NULL) {
 			c->next = temp;
 			temp->next = NULL;
-		}else {
+		}
+		else {
 			temp->next = c->next;
 			c->next = temp;
 		}
@@ -76,25 +89,38 @@ void add_to_database( int id, float gpa) {
 	c = gpa_ll;
 	if (gpa_ll==NULL) {
 		gpa_ll = temp;
+
 		printf("added gpa in case empty\n");
-	} else if (gpa_ll->next==NULL)
+	} 
+	else if (gpa_ll->next==NULL)
 	{
-		if ((gpa_ll->data->gpa) > (p->gpa)) {
+		if (gpa_ll->data->gpa < p->gpa) {
 			gpa_ll->next = temp;
-			printf("added gpa in case greater than head\n");
+			printf("gpa greater than head\n");
 		} else {
 			temp->next = gpa_ll;
 			gpa_ll->next = NULL;
 			gpa_ll = temp;
-			printf("added gpa in case less than head\n");
+			printf("gpa less than head\n");
+
 		}
 		printf("added gpa in case len<2\n");
-	} else {
+	} 
+	else {
 		printf("added gpa in case len>2\n");
-		while ((p->gpa) > (c->next->data->gpa) && (c->next != NULL)) {
-			c = c->next;
+		if ((p->gpa)<(c->data->gpa)) {
+			temp->next = gpa_ll;
+			gpa_ll = temp;
+			printf("added to head\n");
+		} 
+		else {
+			while ((c->next != NULL) && (p->gpa) > (c->next->data->gpa) ) {
+				c = c->next;
+			}
 		}
+		printf("found pos\n");
 		if (c->next == NULL) {
+			printf("add to tail\n");
 			c->next = temp;
 			temp->next = NULL;
 		}else {
@@ -142,6 +168,14 @@ void show_by_GPA()
 	}
 }
 
+void top_5_percent() 
+{
+	struct sorted_node *temp;
+	int count = 0;
+	while 
+
+}
+
 
 void menu()
 {
@@ -182,10 +216,10 @@ void menu()
 			//Shows the list of all students, sorted by GPA
 			show_by_GPA();
 			break;
-		// case '4': 
-		// 	//Shows 5% of studentd with highest GPA
-		// 	top_5_percent();
-		// 	break;
+		case '4': 
+			//Shows 5% of studentd with highest GPA
+			top_5_percent();
+			break;
 		// case '5': 
 		// 	/*
 		// 		Should receive 8 inputs from the user. 
