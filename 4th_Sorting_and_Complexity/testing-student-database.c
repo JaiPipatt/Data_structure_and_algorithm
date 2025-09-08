@@ -2,6 +2,7 @@
 #include<stdlib.h>
 #include<string.h>
 #include <math.h>
+#include <time.h> 
 
 /*
 	Student ID is an up to 8-digit number, where each digit is either 1, 2 or 3
@@ -26,6 +27,10 @@ struct data_tree *student_tree = NULL;
 struct sorted_node *id_ll = NULL;
 struct sorted_node *gpa_ll = NULL;
 
+int id_exists(int id);
+int random_id();
+void populate_random(int count);
+
 // Validate that an ID contains only digits 1,2,3 (and at least one digit)
 int is_valid_id(int id) {
 	if (id <= 0) return 0;
@@ -36,6 +41,7 @@ int is_valid_id(int id) {
 	}
 	return 1;
 }
+
 
 void add_to_tree(struct data_tree *p, struct data_tree *root ,int depth, int lenght, int id)
 {
@@ -220,6 +226,40 @@ void add_to_database( int id, float gpa)
 	}
 }
 
+// NEW: check if an ID already exists (linear scan of id_ll)
+int id_exists(int id) {
+    struct sorted_node *c = id_ll;
+    while (c) {
+        if (c->data->id == id) return 1;
+        c = c->next;
+    }
+    return 0;
+}
+
+// NEW: generate a random ID length 1..8, digits only 1..3
+int random_id() {
+    int len = (rand() % 8) + 1;
+    int id = 0;
+    for (int i = 0; i < len; i++) {
+        id = id * 10 + (rand() % 3 + 1); // digit 1..3
+    }
+    return id;
+}
+
+// NEW: populate database with 'count' random unique IDs
+void populate_random(int count) {
+    int added = 0;
+    while (added < count) {
+        int id = random_id();
+        if (id_exists(id)) continue; // avoid overwriting existing IDs
+        float gpa = ((float)rand() / (float)RAND_MAX) * 4.0f;
+        add_to_database(id, gpa);
+        added++;
+    }
+    printf("Added %d random entries.\n", added);
+}
+
+
 
 void add_new_entry()
 {
@@ -353,73 +393,48 @@ void search_by_number()
 
 void menu()
 {
-	char c[80];
+    char c[80];
 
-	printf("Options: \n\
-		1: Add new entry\n\
-		2: Show all students by ID\n\
-		3: Show all students by GPA\n\
-		4: Show top 5%% of students by GPA\n\
-		5: Search by student number\n");
+    printf("Options: \n\
+        1: Add new entry\n\
+        2: Show all students by ID\n\
+        3: Show all students by GPA\n\
+        4: Show top 5%% of students by GPA\n\
+        5: Search by student number\n\
+        6: Populate 200 random entries\n");
 
-	fgets(c,80,stdin);
-	if(strlen(c) != 2)
-	{
-		printf("Invalid entry \"%s\".\n",c);
-		return;
-	}
+    fgets(c,80,stdin);
+    if(strlen(c) != 2)
+    {
+        printf("Invalid entry \"%s\".\n",c);
+        return;
+    }
 
-	/*
-		First: Get options 1, 2 and 3 working (ignore the rest)
-		Second: get option 4 working
-		Finally: get option 5 working
-	*/
-
-
-	switch(c[0])
-	{
-		case '1': 
-			//Adds a new student to the database
-			add_new_entry(); 
-			break;
-		case '2': 
-			//Shows the list of all students, sorted by ID number
-			show_by_ID(); 
-			break;
-		case '3': 
-			//Shows the list of all students, sorted by GPA
-			show_by_GPA();
-			break;
-		case '4': 
-			//Shows 5% of studentd with highest GPA
-			top_5_percent();
-			break;
-		case '5': 
-			/*
-				Should receive 8 inputs from the user. 
-				Every time the user inputs a number, should print all students whose IDs match the number thus far
-
-				E.g.: if the database contains the students "122", "123", "131", and "222"
-
-					After user inputs "1", should print:
-						122
-						123
-						131
-
-					After user inputs "2", should print
-
-						122
-						123
-
-					And so on
-			*/
-			search_by_number();
-			break;
-		default: 
-			printf("Invalid entry \"%c\".\n",c[0]);
-	}
-
-	return;
+    // ...existing switch...
+    switch(c[0])
+    {
+        case '1':
+            add_new_entry();
+            break;
+        case '2':
+            show_by_ID();
+            break;
+        case '3':
+            show_by_GPA();
+            break;
+        case '4':
+            top_5_percent();
+            break;
+        case '5':
+            search_by_number();
+            break;
+        case '6':
+            populate_random(200);
+            break;
+        default:
+            printf("Invalid entry \"%c\".\n",c[0]);
+    }
+    return;
 }
 
 int main() {
@@ -429,6 +444,9 @@ int main() {
 	student_tree->id = -1;     // sentinel marker (not a real student id)
 	student_tree->gpa = -1.0f;
 	student_tree->one = student_tree->two = student_tree->three = NULL;
+
+    // NEW: seed RNG
+    srand((unsigned)time(NULL));
 
     while (1) {
         menu();
