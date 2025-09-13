@@ -258,6 +258,7 @@ int left_wall_solve(int x, int y, int direction)
         direction = turn_right(direction); 
     }
 	print_map();
+	printf("\n");
     // add sleep
     Sleep(50);
     left_wall_solve(x, y, direction);
