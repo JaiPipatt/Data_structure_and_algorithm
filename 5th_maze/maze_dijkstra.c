@@ -1,6 +1,6 @@
 #include<stdio.h>
 #include<stdlib.h>
-#include<unistd.h>
+#include<Windows.h>
 #include<limits.h>
 
 #define SIDE 22
@@ -155,7 +155,7 @@ void left_wall_solve()
 			y = y + ((wall_x) ? ((wall_x == 1) ? -1: 1) : 0);
 
 			map[x][y] = 'O';
-			usleep(125000);
+			Sleep(50);
 		}
 		//wall to the left
 		else
@@ -174,7 +174,7 @@ void left_wall_solve()
 				//printf("x %d y %d\n",x,y);
 
 				map[x][y] = 'O';
-				usleep(125000);
+				Sleep(50);
 			}
 			//wall in front
 			//turn right, dont move
@@ -212,7 +212,7 @@ void left_wall_solve()
 struct edge
 {
     //distance
-    unsigned int distance;
+    unsigned int distance; // make unsigned to avoid negative distance (unsigned int = positive int only)
     //pointer to target node
     struct graph_node *target;
 };
@@ -551,7 +551,7 @@ int main()
 	reset_map();
 	print_map();
 
-	//left_wall_solve();
+	// left_wall_solve();
 
 	//we know first node: start position
 	int i, j;
